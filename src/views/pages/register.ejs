@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/repository/bootstrap/bootstrap.css">
+</head>
+<body>
+    <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+        <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+            <div class="card-body p-4">
+
+                <h4 class="text-center text-primary mb-3 fw-semibold">
+                    <i class="bi bi-person-plus-fill me-1"></i> Criar Conta
+                </h4>
+                <p class="text-center text-secondary mb-4 small">
+                    Preencha os campos abaixo para se registrar no sistema
+                </p>
+
+                <div id="errors">
+
+                </div>
+
+                <!-- Formulário de Registro -->
+                <form autocomplete="off" id="registerForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="nome"
+                                name="nome"
+                                placeholder="Digite seu nome"
+                                required
+                            >
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="sobrenome" class="form-label">Sobrenome</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="sobrenome"
+                                name="sobrenome"
+                                placeholder="Digite seu sobrenome"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            placeholder="Digite seu e-mail"
+                            required
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="biografia" class="form-label">Biografia</label>
+                        <textarea
+                            class="form-control"
+                            id="biografia"
+                            name="biografia"
+                            rows="3"
+                            placeholder="Fale um pouco sobre você..."
+                        ></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="avatar" class="form-label">Foto de perfil</label>
+                        <input
+                            type="file"
+                            class="form-control"
+                            id="avatar"
+                            name="avatar"
+                            accept="image/*"
+                        >
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="senha" class="form-label">Senha</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="senha"
+                            name="senha"
+                            placeholder="Crie uma senha"
+                            required
+                        >
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-success">
+                            Registrar
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">
+                            Já possui uma conta?
+                            <a href="/auth/login" class="link-primary fw-semibold text-decoration-none">
+                            Faça login
+                            </a>
+                        </p>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const form = document.getElementById('registerForm');
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            try {
+                const formData = new FormData(form);
+
+                const response = await axios.post('http://localhost:3000/users', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+
+                window.location.href = '/auth/login';
+            } catch (err) {
+                document.getElementById('errors').innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        ${err.response.data.error.message}
+                    </div>
+                `
+            } 
+        });
+    </script>
+
+</body>
+</html>
+

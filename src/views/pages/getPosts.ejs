@@ -1,0 +1,95 @@
+<% layout('layouts/main') %>
+
+<div class="d-flex justify-content-between align-items-center">
+  <h1 class="h4 mt-3 mb-3">Posts recentes</h1>
+  <a class="btn btn-primary" href="/post/create"><i class="bi bi-plus-circle-fill me-1"></i> Criar post</a>
+</div>
+<div id="postsContainer"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const container = document.getElementById('postsContainer');
+
+  try {
+    const response = await api.get('/posts/all');
+
+    const posts = response.data.data;
+
+    if (!posts || posts.length === 0) {
+      container.innerHTML = `
+        <div class="alert alert-info text-center">Nenhum post encontrado.</div>
+      `;
+      return;
+    }
+
+    // Gera os cards dinamicamente
+    posts.forEach(post => {
+      const card = document.createElement('div');
+      card.className = 'card shadow-sm mb-3';
+      card.innerHTML = `
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <img crossorigin="anonymous" src="http://localhost:3000${post.usuarios.avatar_url}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+            <div>
+              <strong>${post.usuarios.nome} ${post.usuarios.sobrenome}</strong><br>
+              <small class="text-muted">${new Date(post.data_criacao).toLocaleDateString('pt-BR')}</small>
+            </div>
+          </div>
+          <h5 class="fw-semibold">${post.titulo}</h5>
+          <p class="text-muted mb-2">${post.conteudo}</p>
+          <div class="d-flex align-items-center gap-2">
+            <button 
+              class="btn btn-outline-primary btn-sm like-btn" 
+              data-id="${post.idpost}" 
+              id="btn-like"
+              data-curtido="${post.curtidas.length > 0 ? 'true' : 'false' }"
+            >
+              ${post.curtidas.length > 0 
+                ? 'Descurtir <i class="bi bi-heart-fill ms-1 text-danger"></i>' 
+                : 'Curtir <i class="bi bi-heart ms-1"></i>' }
+            </button>
+            <span class="badge text-bg-light" id="num-curtidas">${post._count.curtidas}</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = `
+      <div class="alert alert-danger text-center">Erro ao carregar posts.</div>
+    `;
+  }
+});
+
+
+document.addEventListener('click', async (event) => {
+  if (event.target.closest('.like-btn')) {
+    const btn = event.target.closest('.like-btn');
+
+    const id = btn.dataset.id;
+    const curtido = btn.dataset.curtido === 'true';
+    const numCurtidas = btn.parentElement.querySelector('#num-curtidas');
+
+    try {
+      const resp = await api.post(`likes/${id}`);
+
+      if (curtido) {
+        btn.dataset.curtido = 'false';
+        btn.innerHTML = 'Curtir <i class="bi bi-heart ms-1"></i>';
+        numCurtidas.textContent = Number(numCurtidas.textContent) - 1;
+      } else {
+        btn.dataset.curtido = 'true';
+        btn.innerHTML = 'Descurtir <i class="bi bi-heart-fill ms-1 text-danger"></i>';
+        numCurtidas.textContent = Number(numCurtidas.textContent) + 1;
+      }
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+});
+
+
+</script>

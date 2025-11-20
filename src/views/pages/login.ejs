@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/repository/bootstrap/bootstrap.css">
+</head>
+<body>
+    <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+        <div class="card shadow-lg border-0 rounded-4" style="max-width: 400px; width: 100%;">
+            <div class="card-body p-4">
+
+                <h4 class="text-center text-primary mb-3 fw-semibold">
+                    <i class="bi bi-person-circle me-1"></i> Acessar Conta
+                </h4>
+                <p class="text-center text-secondary mb-4 small">
+                    Entre com suas credenciais para continuar
+                </p>
+
+                <div id="errorMessage">
+
+                </div>
+
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            placeholder="Digite seu e-mail"
+                            required
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="senha"
+                            name="senha"
+                            placeholder="Digite sua senha"
+                            required
+                        >
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary">
+                            Entrar
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">
+                            Não possui conta?
+                            <a href="/auth/register" class="link-primary fw-semibold text-decoration-none">
+                            Registre-se
+                            </a>
+                        </p>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <script src="/repository/axios.js"></script>
+    <script>
+        const form = document.getElementById('loginForm');
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            try {
+                const formData = new FormData(form);
+
+                const data = Object.fromEntries(formData.entries());
+
+                const response = await axios.post('http://localhost:3000/login', data, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                localStorage.setItem("token", response.data.data.token);
+                window.location.href = '/post/getposts';
+            } catch (err) {
+                document.getElementById('errorMessage').innerHTML = `
+                    <div class="alert alert-warning" role="alert">
+                    Usuário ou senha incorretos.
+                    </div>
+                `
+                console.log(err)
+            } 
+        });
+    </script>
+</body>
+</html>
+
